@@ -1,0 +1,26 @@
+.navbar-default {
+  background-color: #e5ecf5cc;
+  box-shadow: 0px 4px 4px rgb(0 0 0 / 30%);
+}
+
+.user-dropdown {
+  z-index: 150;
+  position: absolute;
+  background-color: #f7f7f7;
+  padding-left: 10px;
+  padding-right: 10px;
+  box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+}
+
+.drop-parent {
+  position: relative;
+}
+
+.drop-opt {
+  text-decoration: none !important;
+  font-size: 16px !important;
+}
+
+.nav-font {
+  color: rgba(0, 0, 0, 0.9);
+}

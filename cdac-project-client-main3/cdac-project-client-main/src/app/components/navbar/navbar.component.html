@@ -1,0 +1,96 @@
+<nav
+  class="navbar navbar-default"
+  style="border: 0; padding: 0; margin: 0; border-radius: 0"
+>
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a
+        class="navbar-brand"
+        [routerLink]="['']"
+        style="padding: 5px; margin: 0"
+        ><img style="width: 80px" src="assets/elect-home-logo.png"
+      /></a>
+      <a class="navbar-brand" [routerLink]="['']"
+        >&nbsp;&nbsp;E-Voting System</a
+      >
+      <span
+        class="navbar-brand"
+        style="padding-top: 30px; font-size: x-small"
+        *ngIf="loggedIn && selectedRole"
+      >
+        <span
+          style="background-color: #083e54; color: whitesmoke; padding: 3px"
+          >{{ selectedRole }}</span
+        >
+      </span>
+      <span
+        class="navbar-brand"
+        style="padding-top: 30px; font-size: x-small"
+        *ngIf="loggedIn && voterId && selectedRole == 'voter'"
+      >
+        <span style="background-color: #083e54; color: whitesmoke; padding: 3px"
+          >VoterId: {{ voterId }}</span
+        >
+      </span>
+    </div>
+    <div id="navbar">
+      <ul class="nav navbar-brand navbar-right">
+        <li *ngIf="!loggedIn">
+          <a
+            class="nav-link nav-font"
+            [routerLink]="['/login']"
+            routerLinkActive="active"
+            >Login</a
+          >
+        </li>
+        <li *ngIf="!loggedIn">
+          <a
+            class="nav-link nav-font"
+            [routerLink]="['/register']"
+            routerLinkActive="active"
+            >Registration</a
+          >
+        </li>
+        <li *ngIf="loggedIn">
+          <a
+            class="nav-link nav-font"
+            [routerLink]="['/dashboard']"
+            routerLinkActive="active"
+            >Dashboard</a
+          >
+        </li>
+        <li *ngIf="loggedIn && user.role == user.USER_ROLES.ELECTION_OFFICIAL">
+          <a
+            class="nav-link nav-font"
+            [routerLink]="['/election/create']"
+            routerLinkActive="active"
+            >Create Election</a
+          >
+        </li>
+        <div class="drop-parent">
+          <li *ngIf="loggedIn">
+            <a class="dropdown-toggle" style="padding: 5px; margin: 0"
+              ><img
+                style="width: 40px"
+                src="assets/elect-user.png"
+                (click)="toggleDrop()"
+            /></a>
+            <div *ngIf="droptoggle" class="user-dropdown">
+              <p>
+                <a class="drop-opt nav-font" [routerLink]="['/profile']"
+                  >Profile</a
+                >
+              </p>
+              <p>
+                <a class="drop-opt nav-font" href="#" (click)="logout()"
+                  >Logout</a
+                >
+              </p>
+            </div>
+          </li>
+        </div>
+      </ul>
+    </div>
+    <!--/.nav-collapse -->
+  </div>
+</nav>

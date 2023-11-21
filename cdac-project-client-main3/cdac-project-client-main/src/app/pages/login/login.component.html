@@ -1,0 +1,100 @@
+<div class="app-loading-img" *ngIf="loadingData"></div>
+<br />
+<div class="parentCont">
+  <div id="mainTop">
+    <div class="container">
+      <div class="center-app">
+        <div class="col-sm-6 col-md-4 col-md-offset-4">
+          <div class="account-wall">
+            <div>
+              <img class="profile-img" src="assets/elect-logo.png" alt="" />
+              <h1 class="text-center login-title">Login With</h1>
+              <div class="button-content">
+                <button
+                  class="btn btn-primary btn-ali btn-block"
+                  (click)="toggleToMail()"
+                >
+                  E-mail
+                </button>
+                <button
+                  class="btn btn-primary btn-ali btn-block"
+                  (click)="toggleToVoter()"
+                >
+                  VoterId
+                </button>
+              </div>
+            </div>
+            <form class="form-signin" #loginForm="ngForm" (ngSubmit)="login()">
+              <div
+                class="alert alert-danger"
+                style="margin: 0 30px 0 30px"
+                *ngIf="errorMessage"
+              >
+                {{ errorMessage }}
+              </div>
+              <br />
+              <div *ngIf="loginWith === 'email'">
+                <input
+                  type="text"
+                  class="form-control form-elem"
+                  placeholder="Email"
+                  required
+                  autofocus
+                  tabindex="1"
+                  [(ngModel)]="user.email"
+                  name="email"
+                />
+                <input
+                  type="password"
+                  class="form-control"
+                  placeholder="Password"
+                  required
+                  tabindex="2"
+                  [(ngModel)]="user.password"
+                  name="password"
+                />
+              </div>
+
+              <div *ngIf="loginWith === 'voterid'">
+                <input
+                  type="text"
+                  class="form-control form-elem"
+                  placeholder="Voter Id"
+                  required
+                  autofocus
+                  tabindex="1"
+                  [(ngModel)]="user.voterId"
+                  name="voterid"
+                />
+                <input
+                  type="password"
+                  class="form-control"
+                  placeholder="Password"
+                  required
+                  tabindex="2"
+                  [(ngModel)]="user.password"
+                  name="password"
+                />
+              </div>
+
+              <button
+                class="btn btn-primary btn-block btn-sign btn-color btn-cen"
+                type="submit"
+                [disabled]="loginForm.invalid"
+              >
+                Sign in
+              </button>
+              <a [routerLink]="['/register']" class="text-center new-account"
+                >Create an account
+              </a>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="mainBack" class="col-12">
+    <img id="imageBack" src="../../../assets/elect-back.jpg" />
+  </div>
+</div>

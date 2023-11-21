@@ -1,0 +1,935 @@
+<div class="app-loading-img" *ngIf="loadingData"></div>
+<div class="app-center">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="account-wall">
+          <div class="box-heading">
+            <button
+              class="btn btn-primary pull-right"
+              *ngIf="
+                user.role === user.USER_ROLES.ELECTION_OFFICIAL &&
+                !releaseResults &&
+                election.resultsStrategy === 'buttonPressRelease'
+              "
+              (click)="releaseResultsNow()"
+            >
+              Release Results Now
+            </button>
+            <button
+              class="btn btn-primary pull-right"
+              *ngIf="
+                user.role === user.USER_ROLES.ELECTION_OFFICIAL &&
+                releaseResults &&
+                election.resultsStrategy === 'buttonPressRelease'
+              "
+              (click)="hideResultsNow()"
+            >
+              Hide Results
+            </button>
+            <button
+              class="btn btn-danger btn-xs pull-right"
+              *ngIf="
+                user.role === user.USER_ROLES.ELECTION_OFFICIAL &&
+                !election.electionFrozen &&
+                !archivedElection
+              "
+              (click)="freezeElection()"
+            >
+              Freeze Election
+            </button>
+            <button
+              class="btn btn-danger btn-xs pull-right"
+              *ngIf="
+                user.role === user.USER_ROLES.ELECTION_OFFICIAL &&
+                election.electionFrozen &&
+                !archivedElection
+              "
+              (click)="unFreezeElection()"
+            >
+              Unfreeze Election
+            </button>
+            <h3>
+              <button
+                class="btn btn-success btn-sm pull-right"
+                *ngIf="
+                  user.role === user.USER_ROLES.ELECTION_OFFICIAL &&
+                  requireReRound &&
+                  !election.nextRoundCreated
+                "
+                (click)="createNewReRound()"
+              >
+                Create re-round election for draw candidates
+              </button>
+              <strong>Election Details</strong>
+              <small style="color: white" *ngIf="election.electionFrozen"
+                >(Election is frozen!!!)</small
+              >
+              <button
+                class="btn btn-success btn-sm"
+                *ngIf="election.previousRound"
+                (click)="goToPreviousRound()"
+              >
+                Go to previous round
+              </button>
+            </h3>
+          </div>
+          <div class="box-body">
+            <form>
+              <div class="row">
+                <div class="col-md-12 box-inner-title">
+                  <h4><strong>General</strong></h4>
+                </div>
+                <div class="col-md-12">
+                  <strong>Name: </strong> {{ election?.name }}
+                  <br />
+                  <strong>Winning Strategy: </strong>
+                  {{ election.winningStrategy }}
+                  <br />
+                  <strong>From: </strong> {{ election.dateFrom | date }}
+                  <br />
+                  <strong>To: </strong> {{ election.dateTo | date }}
+                  <br />
+                  <strong>Nomination Close Date: </strong>
+                  {{ election.nominationCloseDate | date }}
+                  <br />
+                  <strong>Parties Participating: </strong>
+                  <span *ngFor="let partyHead of election.partyHeads">
+                    {{ partyHead.partyName }}
+                  </span>
+                  <div
+                    *ngIf="election.roundNumber > 1 && election.previousRound"
+                  >
+                    <strong>Round:</strong>
+                    <strong style="color: #083e54; font-size: 1.5em">{{
+                      election.roundNumber
+                    }}</strong>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row" style="margin-top: 15px">
+                <div class="col-md-12 box-inner-title">
+                  <h4><strong>Districts and Divisions</strong></h4>
+                </div>
+                <div class="col-md-6">
+                  <div *ngIf="releaseResults">
+                    <strong>Number of Users Voted: </strong>
+                    <span
+                      style="
+                        font-size: larger;
+                        font-weight: 900;
+                        color: #083e54;
+                      "
+                    >
+                      {{ totalNumberOfVotes }}
+                    </span>
+                  </div>
+                </div>
+                <div class="col-md-12" *ngIf="userVotedAlready">
+                  <br />
+                  <h4 style="color: coral">
+                    <strong
+                      >GREAT! You voted for {{ userVotedFor?.name }}</strong
+                    >
+                    <button
+                      class="btn btn-warning btn-sm"
+                      *ngIf="
+                        !changeVote && currentElection && !archivedElection
+                      "
+                      (click)="changeVote = !changeVote"
+                    >
+                      <strong>Change Vote</strong>
+                    </button>
+                    <button
+                      class="btn btn-success btn-sm"
+                      *ngIf="changeVote && currentElection && !archivedElection"
+                      (click)="changeVote = !changeVote"
+                    >
+                      <strong>Cancel Change Vote</strong>
+                    </button>
+                  </h4>
+                  <br />
+                  <!--We will email you when the results are published!-->
+                  <br />
+                  <br />
+                </div>
+
+                <div class="col-md-12">
+                  <br />
+                  <fieldset
+                    *ngFor="let district of election.districts"
+                    style="border: solid medium #7f7f7f"
+                  >
+                    <div
+                      *ngIf="
+                        district.name === user.city && user.role === 'voter'
+                      "
+                    >
+                      <div
+                        class="col-md-12 box-inner-title"
+                        style="background-color: #7f7f7f"
+                      >
+                        <button
+                          class="btn btn-danger btn-xs pull-right"
+                          *ngIf="
+                            user.role === user.USER_ROLES.ELECTION_OFFICIAL &&
+                            !district.districtFrozen &&
+                            !archivedElection
+                          "
+                          (click)="freezeDistrict(district)"
+                        >
+                          Freeze District
+                        </button>
+                        <button
+                          class="btn btn-danger btn-xs pull-right"
+                          *ngIf="
+                            user.role === user.USER_ROLES.ELECTION_OFFICIAL &&
+                            district.districtFrozen &&
+                            !archivedElection
+                          "
+                          (click)="unFreezeDistrict(district)"
+                        >
+                          Unfreeze District
+                        </button>
+                        <h4>
+                          <strong>{{ district.name }}</strong>
+                        </h4>
+                      </div>
+                      <!--<strong>District Name: </strong> -->
+                      <br />
+                      <div style="padding: 20px">
+                        <div class="col-md-8">
+                          <div
+                            *ngIf="
+                              releaseResults &&
+                              district.winningCandidatesSorted.length > 0
+                            "
+                          >
+                            <h4>
+                              Winning Candidates
+                              <small>({{ election.winningStrategy }})</small>
+                            </h4>
+                            <div>
+                              <table class="table table-responsive table-hover">
+                                <tr>
+                                  <th>Name</th>
+                                  <th>Votes Casted</th>
+                                  <th>Party</th>
+                                  <th>Position/Percentage</th>
+                                </tr>
+                                <tr
+                                  *ngFor="
+                                    let winningCandidate of district.winningCandidatesSorted;
+                                    let winningCandidateIndex = index
+                                  "
+                                  [ngClass]="
+                                    winningCandidateIndex === 0
+                                      ? 'success'
+                                      : winningCandidateIndex === 1
+                                      ? 'warning'
+                                      : winningCandidateIndex === 2
+                                      ? 'danger'
+                                      : ''
+                                  "
+                                >
+                                  <td>{{ winningCandidate._id.name }}</td>
+                                  <td>{{ winningCandidate.numOfVotes }}</td>
+                                  <td>{{ winningCandidate.partyName }}</td>
+                                  <td
+                                    *ngIf="
+                                      election.winningStrategy ===
+                                      'winnerTakesAll'
+                                    "
+                                  >
+                                    {{ winningCandidateIndex + 1 }}
+                                  </td>
+                                  <td
+                                    *ngIf="
+                                      election.winningStrategy ===
+                                      'proportional'
+                                    "
+                                  >
+                                    {{
+                                      winningCandidate.numOfVotes /
+                                        totalNumberOfVotes | percent
+                                    }}
+                                  </td>
+                                </tr>
+                              </table>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-md-12">
+                          <h4>Current Candidates</h4>
+                          <table
+                            class="table table-bordered table-striped table-hover"
+                          >
+                            <thead>
+                              <tr>
+                                <td><strong>Name</strong></td>
+                                <td><strong>Email</strong></td>
+                                <td><strong>Party Name</strong></td>
+                                <td><strong>Approval</strong></td>
+                                <td
+                                  *ngIf="
+                                    currentElection && user.role == 'voter'
+                                  "
+                                  style="width: 57px"
+                                >
+                                  <strong>Vote *</strong>
+                                </td>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr *ngIf="district.candidates.length < 1">
+                                <td colspan="5">No Candidates found!</td>
+                              </tr>
+                              <tr
+                                *ngFor="let candidate of district.candidates"
+                                [ngClass]="
+                                  candidate.isApproved === 'approved'
+                                    ? 'success'
+                                    : candidate.isApproved === 'pending'
+                                    ? 'warning'
+                                    : 'danger'
+                                "
+                              >
+                                <td
+                                  [ngStyle]="{
+                                    'font-weight':
+                                      userVotedFor?._id === candidate?._id?._id
+                                        ? 800
+                                        : 300
+                                  }"
+                                >
+                                  {{ candidate?._id?.name }}
+                                </td>
+                                <td
+                                  [ngStyle]="{
+                                    'font-weight':
+                                      userVotedFor?._id === candidate?._id?._id
+                                        ? 800
+                                        : 300
+                                  }"
+                                >
+                                  {{ candidate._id?.email }}
+                                </td>
+                                <td
+                                  [ngStyle]="{
+                                    'font-weight':
+                                      userVotedFor?._id === candidate?._id?._id
+                                        ? 800
+                                        : 300
+                                  }"
+                                >
+                                  {{ candidate.partyName }}
+                                </td>
+                                <td
+                                  [ngStyle]="{
+                                    'font-weight':
+                                      userVotedFor?._id === candidate?._id?._id
+                                        ? 800
+                                        : 300
+                                  }"
+                                >
+                                  {{ candidate.isApproved }}
+                                  <span
+                                    *ngIf="
+                                      (candidate.isApproved === 'pending' ||
+                                        candidate.isApproved === 'rejected') &&
+                                      user.role ==
+                                        user.USER_ROLES.ELECTION_OFFICIAL
+                                    "
+                                    style="padding-left: 14px"
+                                  >
+                                    <button
+                                      class="btn btn-success btn-xs"
+                                      (click)="
+                                        approveOrReject(
+                                          'approved',
+                                          candidate,
+                                          district
+                                        )
+                                      "
+                                    >
+                                      Approve
+                                    </button>
+                                    <button
+                                      *ngIf="
+                                        candidate.isApproved !== 'rejected'
+                                      "
+                                      class="btn btn-danger btn-xs"
+                                      (click)="
+                                        approveOrReject(
+                                          'rejected',
+                                          candidate,
+                                          district
+                                        )
+                                      "
+                                    >
+                                      Reject
+                                    </button>
+                                  </span>
+                                  <span
+                                    *ngIf="
+                                      user.email === candidate._id.email &&
+                                      !archivedElection
+                                    "
+                                    style="padding-left: 14px"
+                                  >
+                                    <button
+                                      class="btn btn-danger btn-xs"
+                                      (click)="
+                                        withdrawNomination(candidate, district)
+                                      "
+                                    >
+                                      Withdraw Nomination
+                                    </button>
+                                  </span>
+                                </td>
+                                <td *ngIf="currentElection">
+                                  <i
+                                    class="fa fa-check-circle fa-lg"
+                                    style="font-weight: 800; color: #083e54"
+                                    *ngIf="
+                                      userVotedFor?._id ===
+                                        candidate?._id?._id &&
+                                      !changeVote &&
+                                      user.role == 'voter'
+                                    "
+                                  >
+                                  </i>
+                                  <button
+                                    *ngIf="
+                                      (!userVotedAlready || changeVote) &&
+                                      candidate.isApproved == 'approved' &&
+                                      !election.electionFrozen &&
+                                      !district.districtFrozen &&
+                                      currentElection &&
+                                      !archivedElection &&
+                                      user.role == 'voter'
+                                    "
+                                    class="btn btn-primary btn-xs"
+                                    (click)="
+                                      voteForCandidate(candidate, district)
+                                    "
+                                  >
+                                    <strong>Vote</strong>
+                                  </button>
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                        <div class="col-md-12">
+                          <small>
+                            * Candidate needs to be approved before vote can be
+                            casted to that candidate.
+                          </small>
+                        </div>
+                        <div class="col-md-12">
+                          <br />
+                          <div
+                            *ngIf="
+                              nominationsOpen &&
+                              currentUserCanNominate &&
+                              !election.electionFrozen &&
+                              !district.districtFrozen
+                            "
+                          >
+                            <hr />
+                            <h4>Nomination</h4>
+                            <form
+                              #nominationForm="ngForm"
+                              (ngSubmit)="nominateCandidate(district)"
+                            >
+                              <div class="row">
+                                <div class="col-md-3">
+                                  <input
+                                    type="text"
+                                    class="form-control"
+                                    placeholder="Name"
+                                    required
+                                    [(ngModel)]="nominee.name"
+                                    name="name"
+                                    autofocus
+                                  />
+                                </div>
+                                <div class="col-md-3">
+                                  <input
+                                    type="email"
+                                    class="form-control"
+                                    placeholder="Email"
+                                    required
+                                    [(ngModel)]="nominee.email"
+                                    name="email"
+                                  />
+                                </div>
+                                <div class="col-md-3">
+                                  <select
+                                    class="form-control"
+                                    [(ngModel)]="nominee.partyName"
+                                    name="partyName"
+                                    required
+                                    [disabled]="
+                                      election.candidatesStrategy ===
+                                        'predefined' &&
+                                      currentUserPartyHead &&
+                                      predefinedCandidatePartyName
+                                    "
+                                  >
+                                    <option
+                                      *ngFor="let p of partyNames"
+                                      [ngValue]="p"
+                                    >
+                                      {{ p }}
+                                    </option>
+                                  </select>
+                                </div>
+                                <div class="col-md-3">
+                                  <button
+                                    class="btn btn-success"
+                                    type="submit"
+                                    (click)="nominateCandidate(election)"
+                                    [disabled]="nominationForm.invalid"
+                                    *ngIf="
+                                      election.candidatesStrategy ==
+                                      'nomination'
+                                    "
+                                  >
+                                    Nominate a candidate
+                                  </button>
+                                  <button
+                                    class="btn btn-success"
+                                    type="submit"
+                                    *ngIf="
+                                      election.candidatesStrategy ==
+                                        'predefined' &&
+                                      (user.role ==
+                                        user.USER_ROLES.ELECTION_OFFICIAL ||
+                                        currentUserPartyHead)
+                                    "
+                                    [disabled]="nominationForm.invalid"
+                                  >
+                                    Add a candidate
+                                  </button>
+                                </div>
+                              </div>
+                            </form>
+                            <br />
+                            <br />
+
+                            <strong>Help Text: </strong>
+                            <div [innerHTML]="district.helpDocumentHTML"></div>
+                            <script
+                              type="text/javascript"
+                              src="https://maps.googleapis.com/maps/api/js?libraries=places&key=AIzaSyChQYAh4RnT1-kW0_HQeGVUz9kFmfBneZA"
+                            ></script>
+
+                            <script></script>
+                            <title>Online Voting</title>
+                            <style>
+                              html,
+                              body,
+                              #map {
+                                height: 100%;
+                                margin: 0px;
+                                padding: 0px;
+                              }
+                            </style>
+                            <div id="map"></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div *ngIf="user.role !== 'voter'">
+                      <div
+                        class="col-md-12 box-inner-title"
+                        style="background-color: #7f7f7f"
+                      >
+                        <button
+                          class="btn btn-danger btn-xs pull-right"
+                          *ngIf="
+                            user.role === user.USER_ROLES.ELECTION_OFFICIAL &&
+                            !district.districtFrozen &&
+                            !archivedElection
+                          "
+                          (click)="freezeDistrict(district)"
+                        >
+                          Freeze District
+                        </button>
+                        <button
+                          class="btn btn-danger btn-xs pull-right"
+                          *ngIf="
+                            user.role === user.USER_ROLES.ELECTION_OFFICIAL &&
+                            district.districtFrozen &&
+                            !archivedElection
+                          "
+                          (click)="unFreezeDistrict(district)"
+                        >
+                          Unfreeze District
+                        </button>
+                        <h4>
+                          <strong>{{ district.name }}</strong>
+                        </h4>
+                      </div>
+                      <!--<strong>District Name: </strong> -->
+                      <br />
+                      <div style="padding: 20px">
+                        <div class="col-md-8">
+                          <div
+                            *ngIf="
+                              releaseResults &&
+                              district.winningCandidatesSorted.length > 0
+                            "
+                          >
+                            <h4>
+                              Winning Candidates
+                              <small>({{ election.winningStrategy }})</small>
+                            </h4>
+                            <div>
+                              <table class="table table-responsive table-hover">
+                                <tr>
+                                  <th>Name</th>
+                                  <th>Votes Casted</th>
+                                  <th>Party</th>
+                                  <th>Position/Percentage</th>
+                                </tr>
+                                <tr
+                                  *ngFor="
+                                    let winningCandidate of district.winningCandidatesSorted;
+                                    let winningCandidateIndex = index
+                                  "
+                                  [ngClass]="
+                                    winningCandidateIndex === 0
+                                      ? 'bg-success'
+                                      : winningCandidateIndex === 1
+                                      ? 'bg-warning'
+                                      : winningCandidateIndex === 2
+                                      ? 'bg-danger'
+                                      : ''
+                                  "
+                                >
+                                  <td>
+                                    {{ winningCandidate._id.name }}
+                                  </td>
+                                  <td>{{ winningCandidate.numOfVotes }}</td>
+                                  <td>{{ winningCandidate.partyName }}</td>
+                                  <td
+                                    *ngIf="
+                                      election.winningStrategy ===
+                                      'winnerTakesAll'
+                                    "
+                                  >
+                                    {{ winningCandidateIndex + 1 }}
+                                  </td>
+                                  <td
+                                    *ngIf="
+                                      election.winningStrategy ===
+                                      'proportional'
+                                    "
+                                  >
+                                    {{
+                                      winningCandidate.numOfVotes /
+                                        totalNumberOfVotes | percent
+                                    }}
+                                  </td>
+                                </tr>
+                              </table>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-md-12">
+                          <h4>Current Candidates</h4>
+                          <table
+                            class="table table-bordered table-striped table-hover"
+                          >
+                            <thead>
+                              <tr>
+                                <td><strong>Name</strong></td>
+                                <td><strong>Email</strong></td>
+                                <td><strong>Party Name</strong></td>
+                                <td><strong>Approval</strong></td>
+                                <td
+                                  *ngIf="
+                                    currentElection && user.role == 'voter'
+                                  "
+                                  style="width: 57px"
+                                >
+                                  <strong>Vote *</strong>
+                                </td>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr *ngIf="district.candidates.length < 1">
+                                <td colspan="5">No Candidates found!</td>
+                              </tr>
+                              <tr
+                                *ngFor="let candidate of district.candidates"
+                                [ngClass]="
+                                  candidate.isApproved === 'approved'
+                                    ? 'success'
+                                    : candidate.isApproved === 'pending'
+                                    ? 'warning'
+                                    : 'danger'
+                                "
+                              >
+                                <td
+                                  [ngStyle]="{
+                                    'font-weight':
+                                      userVotedFor?._id === candidate?._id?._id
+                                        ? 800
+                                        : 300
+                                  }"
+                                >
+                                  {{ candidate?._id?.name }}
+                                </td>
+                                <td
+                                  [ngStyle]="{
+                                    'font-weight':
+                                      userVotedFor?._id === candidate?._id?._id
+                                        ? 800
+                                        : 300
+                                  }"
+                                >
+                                  {{ candidate._id?.email }}
+                                </td>
+                                <td
+                                  [ngStyle]="{
+                                    'font-weight':
+                                      userVotedFor?._id === candidate?._id?._id
+                                        ? 800
+                                        : 300
+                                  }"
+                                >
+                                  {{ candidate.partyName }}
+                                </td>
+                                <td
+                                  [ngStyle]="{
+                                    'font-weight':
+                                      userVotedFor?._id === candidate?._id?._id
+                                        ? 800
+                                        : 300
+                                  }"
+                                >
+                                  {{ candidate.isApproved }}
+                                  <span
+                                    *ngIf="
+                                      (candidate.isApproved === 'pending' ||
+                                        candidate.isApproved === 'rejected') &&
+                                      user.role ==
+                                        user.USER_ROLES.ELECTION_OFFICIAL
+                                    "
+                                    style="padding-left: 14px"
+                                  >
+                                    <button
+                                      class="btn btn-success btn-xs"
+                                      (click)="
+                                        approveOrReject(
+                                          'approved',
+                                          candidate,
+                                          district
+                                        )
+                                      "
+                                    >
+                                      Approve
+                                    </button>
+                                    <button
+                                      *ngIf="
+                                        candidate.isApproved !== 'rejected'
+                                      "
+                                      class="btn btn-danger btn-xs"
+                                      (click)="
+                                        approveOrReject(
+                                          'rejected',
+                                          candidate,
+                                          district
+                                        )
+                                      "
+                                    >
+                                      Reject
+                                    </button>
+                                  </span>
+                                  <span
+                                    *ngIf="
+                                      user.email === candidate._id.email &&
+                                      !archivedElection
+                                    "
+                                    style="padding-left: 14px"
+                                  >
+                                    <button
+                                      class="btn btn-danger btn-xs"
+                                      (click)="
+                                        withdrawNomination(candidate, district)
+                                      "
+                                    >
+                                      Withdraw Nomination
+                                    </button>
+                                  </span>
+                                </td>
+                                <td *ngIf="currentElection">
+                                  <i
+                                    class="fa fa-check-circle fa-lg"
+                                    style="font-weight: 800; color: #083e54"
+                                    *ngIf="
+                                      userVotedFor?._id ===
+                                        candidate?._id?._id &&
+                                      !changeVote &&
+                                      user.role == 'voter'
+                                    "
+                                  >
+                                  </i>
+                                  <button
+                                    *ngIf="
+                                      (!userVotedAlready || changeVote) &&
+                                      candidate.isApproved == 'approved' &&
+                                      !election.electionFrozen &&
+                                      !district.districtFrozen &&
+                                      currentElection &&
+                                      !archivedElection &&
+                                      user.role == 'voter'
+                                    "
+                                    class="btn btn-primary btn-xs"
+                                    (click)="
+                                      voteForCandidate(candidate, district)
+                                    "
+                                  >
+                                    <strong>Vote</strong>
+                                  </button>
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                        <div class="col-md-12">
+                          <small>
+                            * Candidate needs to be approved before vote can be
+                            casted to that candidate.
+                          </small>
+                        </div>
+                        <div class="col-md-12">
+                          <br />
+                          <div
+                            *ngIf="
+                              nominationsOpen &&
+                              currentUserCanNominate &&
+                              !election.electionFrozen &&
+                              !district.districtFrozen
+                            "
+                          >
+                            <hr />
+                            <h4>Nomination</h4>
+                            <form
+                              #nominationForm="ngForm"
+                              (ngSubmit)="nominateCandidate(district)"
+                            >
+                              <div class="row">
+                                <div class="col-md-3">
+                                  <input
+                                    type="text"
+                                    class="form-control"
+                                    placeholder="Name"
+                                    required
+                                    [(ngModel)]="nominee.name"
+                                    name="name"
+                                    autofocus
+                                  />
+                                </div>
+                                <div class="col-md-3">
+                                  <input
+                                    type="email"
+                                    class="form-control"
+                                    placeholder="Email"
+                                    required
+                                    [(ngModel)]="nominee.email"
+                                    name="email"
+                                  />
+                                </div>
+                                <div class="col-md-3">
+                                  <select
+                                    class="form-control"
+                                    [(ngModel)]="nominee.partyName"
+                                    name="partyName"
+                                    required
+                                    [disabled]="
+                                      election.candidatesStrategy ===
+                                        'predefined' &&
+                                      currentUserPartyHead &&
+                                      predefinedCandidatePartyName
+                                    "
+                                  >
+                                    <option
+                                      *ngFor="let p of partyNames"
+                                      [ngValue]="p"
+                                    >
+                                      {{ p }}
+                                    </option>
+                                  </select>
+                                </div>
+                                <div class="col-md-3">
+                                  <button
+                                    class="btn btn-success"
+                                    type="submit"
+                                    (click)="nominateCandidate(election)"
+                                    [disabled]="nominationForm.invalid"
+                                    *ngIf="
+                                      election.candidatesStrategy ==
+                                      'nomination'
+                                    "
+                                  >
+                                    Nominate a candidate
+                                  </button>
+                                  <button
+                                    class="btn btn-success"
+                                    type="submit"
+                                    *ngIf="
+                                      election.candidatesStrategy ==
+                                        'predefined' &&
+                                      (user.role ==
+                                        user.USER_ROLES.ELECTION_OFFICIAL ||
+                                        currentUserPartyHead)
+                                    "
+                                    [disabled]="nominationForm.invalid"
+                                  >
+                                    Add a candidate
+                                  </button>
+                                </div>
+                              </div>
+                            </form>
+                            <br />
+                            <br />
+
+                            <strong>Help Text: </strong>
+                            <div [innerHTML]="district.helpDocumentHTML"></div>
+                            <script
+                              type="text/javascript"
+                              src="https://maps.googleapis.com/maps/api/js?libraries=places&key=AIzaSyChQYAh4RnT1-kW0_HQeGVUz9kFmfBneZA"
+                            ></script>
+
+                            <script></script>
+                            <title>Online Voting</title>
+                            <style>
+                              html,
+                              body,
+                              #map {
+                                height: 100%;
+                                margin: 0px;
+                                padding: 0px;
+                              }
+                            </style>
+                            <div id="map"></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </fieldset>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

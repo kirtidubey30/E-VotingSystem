@@ -1,0 +1,222 @@
+<div class="app-loading-img" *ngIf="loadingData"></div>
+
+<br />
+<div class="container" *ngIf="user.role != 'voter'">
+  <div class="row">
+    <div class="col">
+      <h2 *ngIf="user.role != 'voter'">Manage Elections as: {{ user.role }}</h2>
+      <div class="tabs">
+        <div class="tab">
+          <input type="checkbox" id="chck1" />
+          <label class="tab-label" for="chck1">Current Elections</label>
+          <div class="tab-content">
+            <div class="row">
+              <div
+                class="col-sm-6 col-md-4"
+                *ngFor="let election of currentElections"
+              >
+                <div class="box" (click)="electionDetails(election)">
+                  <div class="box-heading text-center dashboard-title">
+                    <strong>{{ election.name }}</strong>
+                  </div>
+                  <div class="box-inner-body">
+                    <div class="text-center dashboard-body-text">
+                      <br />
+                      <div
+                        *ngIf="
+                          election.roundNumber > 1 && election.previousRound
+                        "
+                      >
+                        <strong>Round:</strong>
+                        <strong style="color: #083e54; font-size: 1.5em">{{
+                          election.roundNumber
+                        }}</strong>
+                      </div>
+                      <strong>Districts</strong>
+                      <br />
+                      <div *ngFor="let district of election.districts">
+                        <span>{{ district.name }}</span>
+                      </div>
+                      <br />
+                      <strong
+                        >{{ election.dateFrom | date }} ---
+                        {{ election.dateTo | date }}</strong
+                      >
+                      <br />
+                      <br />
+                      <button
+                        class="btn btn-success btn-sm"
+                        *ngIf="user.role == user.USER_ROLES.ELECTION_OFFICIAL"
+                        (click)="electionEdit(election)"
+                      >
+                        <strong>Edit Election</strong>
+                      </button>
+                      <br />
+                      <br />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tab">
+          <input type="checkbox" id="chck2" />
+          <label class="tab-label" for="chck2">Future Elections</label>
+          <div class="tab-content">
+            <div class="row">
+              <div
+                class="col-sm-6 col-md-4"
+                *ngFor="let election of futureElections"
+              >
+                <div class="box" (click)="electionDetails(election)">
+                  <div class="box-heading text-center dashboard-title">
+                    <strong>{{ election.name }}</strong>
+                  </div>
+                  <div class="box-inner-body">
+                    <div class="text-center dashboard-body-text">
+                      <br />
+                      <div
+                        *ngIf="
+                          election.roundNumber > 1 && election.previousRound
+                        "
+                      >
+                        <strong>Round:</strong>
+                        <strong style="color: #083e54; font-size: 1.5em">{{
+                          election.roundNumber
+                        }}</strong>
+                      </div>
+                      <strong>Districts</strong>
+                      <br />
+                      <div *ngFor="let district of election.districts">
+                        <span>{{ district.name }}</span>
+                      </div>
+                      <br />
+                      <strong
+                        >{{ election.dateFrom | date }} ---
+                        {{ election.dateTo | date }}</strong
+                      >
+                      <br />
+                      <br />
+                      <button
+                        class="btn btn-success btn-sm"
+                        (click)="electionEdit(election)"
+                        *ngIf="user.role == user.USER_ROLES.ELECTION_OFFICIAL"
+                      >
+                        <strong>Edit Election</strong>
+                      </button>
+                      <br />
+                      <br />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tab">
+          <input type="checkbox" id="chck3" />
+          <label class="tab-label" for="chck3">Archived Elections</label>
+          <div class="tab-content">
+            <div class="row">
+              <div
+                class="col-sm-6 col-md-4"
+                *ngFor="let election of pastElections"
+              >
+                <div class="box" (click)="electionDetails(election)">
+                  <div class="box-heading text-center dashboard-title">
+                    <strong>{{ election.name }}</strong>
+                  </div>
+                  <div class="box-inner-body">
+                    <div class="text-center dashboard-body-text">
+                      <br />
+                      <div
+                        *ngIf="
+                          election.roundNumber > 1 && election.previousRound
+                        "
+                      >
+                        <strong>Round:</strong>
+                        <strong style="color: #083e54; font-size: 1.5em">{{
+                          election.roundNumber
+                        }}</strong>
+                      </div>
+                      <strong>Districts</strong>
+                      <br />
+                      <div *ngFor="let district of election.districts">
+                        <span>{{ district.name }}</span>
+                      </div>
+                      <br />
+                      <strong
+                        >{{ election.dateFrom | date }} ---
+                        {{ election.dateTo | date }}</strong
+                      >
+                      <br />
+                      <br />
+                      <button
+                        class="btn btn-success btn-sm"
+                        *ngIf="user.role == user.USER_ROLES.ELECTION_OFFICIAL"
+                        (click)="electionEdit(election)"
+                      >
+                        <strong>Edit Election</strong>
+                      </button>
+                      <br />
+                      <br />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="container" *ngIf="user.role === 'voter'">
+  <div class="row">
+    <div class="col-sm-6 col-md-4" *ngFor="let election of currentElections">
+      <div class="box" (click)="electionDetails(election)">
+        <div class="box-heading text-center dashboard-title">
+          <strong>{{ election.name }}</strong>
+        </div>
+        <div class="box-inner-body">
+          <div class="text-center dashboard-body-text">
+            <br />
+            <div *ngIf="election.roundNumber > 1 && election.previousRound">
+              <strong>Round:</strong>
+              <strong style="color: #083e54; font-size: 1.5em">{{
+                election.roundNumber
+              }}</strong>
+            </div>
+            <strong>Districts</strong>
+            <br />
+            <div *ngFor="let district of election.districts">
+              <span>{{ district.name }}</span>
+            </div>
+            <br />
+            <strong
+              >{{ election.dateFrom | date }} ---
+              {{ election.dateTo | date }}</strong
+            >
+            <br />
+            <br />
+            <button
+              class="btn btn-success btn-sm"
+              *ngIf="user.role == user.USER_ROLES.ELECTION_OFFICIAL"
+              (click)="electionEdit(election)"
+            >
+              <strong>Edit Election</strong>
+            </button>
+            <br />
+            <br />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="voter" *ngIf="!voterElections">
+    <h2>No elections found for your district</h2>
+  </div>
+</div>
+
+<br />

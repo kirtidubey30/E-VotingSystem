@@ -1,0 +1,196 @@
+<div class="app-center">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12">
+				<form #electionForm="ngForm" (submit)="onSubmit()">
+					<div class="account-wall">
+						<div class="box-heading">
+							<button type="submit" class="btn btn-success pull-right"
+							        [disabled]="electionForm.invalid" *ngIf="!editElectionMode">Create
+							</button>
+							<button type="submit" class="btn btn-success pull-right"
+							        [disabled]="electionForm.invalid" *ngIf="editElectionMode">Update
+							</button>
+							<h3 *ngIf="!editElectionMode"><strong>Create Election</strong></h3>
+							<h3 *ngIf="editElectionMode"><strong>Update Election</strong></h3>
+							<span *ngIf="election.roundNumber > 1 && election.previousRound">
+								<strong>Round:</strong> <strong style="color: white; font-size: 1.5em">{{election.roundNumber}}</strong>
+							</span>
+						</div>
+						<div class="box-body">
+							<div class="row">
+								<div class="col-md-12 box-inner-title">
+									<h4><strong>General</strong></h4>
+								</div>
+								<div class="col-md-6">
+									<div class="form-group">
+										<label for="electionName">Election Name</label>
+										<input type="text" class="form-control" id="electionName"
+										       [(ngModel)]="election.name" name="name" required
+										       placeholder="Election Name">
+									</div>
+								</div>
+							</div>
+
+							<div class="row" style="margin-top: 15px;">
+								<div class="col-md-6">
+									<div class="form-group">
+										<label for="winningStrategy">Winning Strategy</label>
+										<select class="form-control" id="winningStrategy"
+										        [(ngModel)]="election.winningStrategy" name="winningStrategy" required>
+											<option value="winnerTakesAll">Winner Takes All</option>
+											<option value="proportional">Proportional</option>
+										</select>
+									</div>
+								</div>
+							</div>
+
+							<div class="row" style="margin-top: 15px;">
+								<div class="col-md-3">
+									<div class="form-group">
+										<label for="dateFrom">Date From</label>
+										<input type="date" class="form-control" id="dateFrom" [ngModel]="election.dateFrom | date:'y-MM-dd'" (ngModelChange)="election.dateFrom = $event" name="dateFrom">
+									</div>
+								</div>
+								<div class="col-md-3">
+									<div class="form-group">
+										<label for="dateTo">Date To</label>
+										<input type="date" class="form-control" id="dateTo" [ngModel]="election.dateTo | date:'y-MM-dd'" (ngModelChange)="election.dateTo = $event" name="dateTo">
+									</div>
+								</div>
+								<div class="col-md-3">
+									<div class="form-group">
+										<label for="nominationCloseDate">Candidates Adding Close Date</label>
+										<input type="date" class="form-control" id="nominationCloseDate" [ngModel]="election.nominationCloseDate | date:'y-MM-dd'" (ngModelChange)="election.nominationCloseDate = $event" name="nominationCloseDate">
+									</div>
+								</div>
+							</div>
+
+							<div class="row" style="margin-top: 15px;">
+								<div class="col-md-6">
+									<label class="radio-inline">
+										<input type="radio" name="resultsStrategy" value="liveResults"
+										       [(ngModel)]="election.resultsStrategy">
+										Live Results
+									</label>
+									<label class="radio-inline">
+										<input type="radio" name="resultsStrategy" value="buttonPressRelease"
+										       [(ngModel)]="election.resultsStrategy">
+										Button Press Release
+									</label>
+									<label class="radio-inline">
+										<input type="radio" name="resultsStrategy" value="selectedDate"
+										       [(ngModel)]="election.resultsStrategy">
+										Release on selected date
+									</label>
+								</div>
+								<div class="col-md-3" *ngIf="election.resultsStrategy === 'selectedDate'">
+									<div class="form-group">
+										<label for="resultsReleaseDate">Release Date</label>
+										<input type="date" class="form-control" id="resultsReleaseDate" [ngModel]="election.resultsReleaseDate | date:'y-MM-dd'" (ngModelChange)="election.resultsReleaseDate = $event" name="resultsReleaseDate">
+									</div>
+								</div>
+							</div>
+
+							<br>
+
+							<div class="row" style="margin-top: 15px;">
+								<div class="col-md-12 box-inner-title">
+									<button class="btn btn-primary pull-right" style="margin: 4px 10px 10px 0 " type="button" (click)="addEmptyPartyHead()">ADD</button>
+									<h4><strong>Party Heads</strong></h4>
+								</div>
+								<div class="col-md-6">
+									<table class="table table-responsive table-condensed table-hover">
+										<thead>
+											<tr>
+												<th>Email</th>
+												<th>Party Name</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr *ngIf="election.partyHeads.length < 1">
+												<td colspan="2">
+													No party heads found! Please click add button to create one.
+												</td>
+											</tr>
+											<tr *ngFor="let partyHead of election.partyHeads">
+												<td>
+													<input type="text" class="form-control input-sm"
+													       [(ngModel)]="partyHead.email" name="partyHeadEmail" [ngModelOptions]="{standalone: true}" required
+													       placeholder="Email">
+												</td>
+												<td>
+													<input type="text" class="form-control input-sm"
+													       [(ngModel)]="partyHead.partyName" name="partyHeadPartyName" [ngModelOptions]="{standalone: true}" required
+													       placeholder="Party Name">
+												</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+
+							<div class="row" style="margin-top: 15px;">
+								<div class="col-md-12 box-inner-title">
+									<button class="btn btn-primary pull-right" style="margin: 4px 10px 10px 0 " type="button" (click)="addEmptyDistrict()">ADD</button>
+									<h4><strong>Districts or Divisions</strong></h4>
+								</div>
+								<div class="col-md-12">
+									<table class="table table-responsive table-condensed table-hover">
+										<thead>
+										<tr>
+											<th>Name</th>
+											<th>Latitude</th>
+											<th>Longitude</th>
+											<th>Help Document (Can be HTML)</th>
+										</tr>
+										</thead>
+										<tbody>
+										<tr *ngIf="election.districts.length < 1">
+											<td colspan="5">
+												No districts or divisions found! Please click add button to create one.
+											</td>
+										</tr>
+										<tr *ngFor="let district of election.districts">
+											<td>
+												<input type="text" class="form-control input-sm"
+												       [(ngModel)]="district.name" name="districtName" [ngModelOptions]="{standalone: true}" required
+												       placeholder="Name">
+											</td>
+											<td>
+												<input type="number" class="form-control input-sm"
+												       [(ngModel)]="district.latitude" name="latitude" [ngModelOptions]="{standalone: true}" required
+												       placeholder="District Latitude">
+											</td>
+											<td>
+												<input type="number" class="form-control input-sm"
+												       [(ngModel)]="district.longitude" name="longitude" [ngModelOptions]="{standalone: true}" required
+												       placeholder="District Longitude">
+											</td>
+											<td>
+												<textarea type="textArea" class="form-control input-sm" rows="3" cols="50"
+												       [(ngModel)]="district.helpDocumentHTML" name="helpDocumentHTML" [ngModelOptions]="{standalone: true}" required
+												          placeholder="<h3>Help Document HTML</h3>"></textarea>
+											</td>
+										</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+							<div class="row" style="margin-top: 15px;" *ngIf="errorMessage">
+								<div class="col-md-12">
+									<h4 class="alert alert-danger">{{errorMessage}}</h4>
+								</div>
+							</div>
+							<div class="row" style="margin-top: 15px;">
+								<div class="col-md-12">
+
+								</div>
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>

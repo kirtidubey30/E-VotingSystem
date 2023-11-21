@@ -1,0 +1,160 @@
+.container-fluid {
+  padding-left: 50px;
+  padding-right: 50px;
+  padding-top: 50px;
+}
+
+.parentCont {
+  position: relative;
+}
+
+.row {
+  margin-left: 0px;
+  margin-right: 0px;
+}
+
+.textAlignRight {
+  text-align: right;
+}
+
+.textAlignLeft {
+  text-align: left;
+}
+
+.textAlignCenter {
+  text-align: center;
+}
+
+.textAlignJustify {
+  text-align: justify;
+}
+
+.accountBtnGroup {
+  background: none;
+  color: #2c3e50;
+}
+
+.carModelImg {
+  max-width: 300px;
+  height: auto;
+}
+
+#main {
+  padding: 0;
+}
+
+#logo {
+  width: 300px;
+  color: inherit;
+}
+
+#logo:hover {
+  text-decoration: none;
+}
+
+#dropDownLogin {
+  margin: 0px;
+}
+
+#header {
+  background: #1d9d74 no-repeat right top;
+  min-height: 64px;
+  margin: 0px;
+  padding-top: 1px;
+}
+
+#navbar {
+  border-radius: 0px;
+  margin-bottom: 0px;
+}
+
+#breadcrumb {
+  margin: 0 0 10px 0;
+}
+
+#mainTop {
+  color: black;
+  border-radius: 0px;
+  min-height: 500px;
+  z-index: 100;
+  position: absolute;
+  background-attachment: fixed;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+#mainBack {
+  opacity: 0.15;
+  position: absolute;
+  z-index: 10;
+}
+
+#imageBack {
+  width: 100%;
+}
+
+#mainBottom {
+  margin-bottom: 20px;
+}
+
+/*<-------------------------------- Sign Up Page -------------------------------------->*/
+#signUpForm {
+  margin-top: 20px;
+}
+
+/*<-------------------------------- Login Page -------------------------------------->*/
+#loginForm {
+  margin-top: 20px;
+}
+
+/*<-------------------------------- Find polling booth By Location -------------------------------------->*/
+#map {
+  min-height: 400px;
+  width: 100%;
+}
+
+/*<-------------------------------- Current Election -------------------------------------->*/
+#contentPanel {
+  margin-top: 10px;
+}
+
+.reportDamageBTN {
+  margin-top: 10px;
+}
+
+.btn:hover {
+  color: orange;
+}
+
+/*<-------------------------------- Admin  Pages -------------------------------------->*/
+/*<-------------------------------- Create Election Page -------------------------------------->*/
+#locationSuggestions {
+  display: none;
+  background-color: #ecf0f1;
+  border-radius: 5px;
+}
+
+#locationSuggestions div {
+  padding: 10px;
+}
+
+#locationSuggestions div:hover {
+  background-color: grey;
+  color: white;
+}
+
+.suggested-lat,
+.suggested-lng {
+  display: none;
+}
+
+/*<-------------------------------- Vote for Election -------------------------------------->*/
+.panel-default > .panel-heading {
+  background: none;
+}
+
+.absolute-panel {
+  background: white;
+  border: 1px solid grey;
+}
